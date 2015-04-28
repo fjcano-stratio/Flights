@@ -85,7 +85,36 @@ object Flight {
    * Extract the different types of errors in a string list
    *
    */
-  def extractErrors(fields: Array[String]): Seq[String] = ???
+  def validateDate(fields: Array[String], l: List[(String, String, String)]): List[String] = {
+    if (l.isEmpty) {
+      List.empty
+    } else {
+      try {
+        ParserUtils.getDateTime(l.head._1.toInt, l.head._2.toInt, l.head._3.toInt)
+        validateDate(fields, l.tail)
+      } catch {
+        case e: Exception => validateDate(fields, l.tail) :+ "DATE"
+      }
+    }
+  }
+
+  def validateInt(fields: Array[String], l: List[Int]): List[String] = {
+    if (l.isEmpty) {
+      List.empty
+    } else {
+      try {
+        fields(l.head).toInt
+        validateInt(fields, l.tail)
+      } catch {
+        case e: Exception => validateInt(fields, l.tail) :+ "TOINT"
+      }
+    }
+  }
+
+  def extractErrors(fields: Array[String]): Seq[String] = {
+    validateInt(fields, List(0, 1, 2, 4, 5, 6, 7, 9, 11, 12, 14, 15, 18, 22)) ++
+    validateDate(fields, List((fields(0), fields(1), fields(2))))
+  }
 
   /*
   *
